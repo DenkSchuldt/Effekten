@@ -1,0 +1,10 @@
+
+  * Grabar audio durante N segundos
+  * Al seleccionar un archivo de audio, pasar la ruta como parámetro para el siguiente GUI.
+  * Implementar los efectos de:
+    - Zeus
+    - Ardilla
+    - Random
+    - Vibrato
+  * Habilitar la funcionalidad de subir y bajar volumen
+  * Detectar cuando un archivo de audio ha terminado de reproducirse
