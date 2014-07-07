@@ -28,6 +28,7 @@ sound = sound';
 handles.ispushed = 0;
 handles.sound = sound;
 handles.fs = fs;
+handles.newfs = fs;
 handles.k = 1;
 handles.output = hObject;
 % Update handles structure
@@ -44,8 +45,53 @@ function uipanel1_SelectionChangeFcn(hObject, eventdata, handles)
 option = get(hObject,'Tag');
 if option == 'radiobutton1'
     %--- Zeus ---%
+    sonido = handles.sound';
+    fs = handles.fs;
+    [nm, c]=size(sonido);
+    sonido2=zeros(nm*2, c);
+    for i=1:nm
+       sonido2(i, 1)=sonido(i, 1); 
+       sonido2(i+nm, 1)=sonido(i, 1);
+       if(c==2)
+        sonido2(i, 2)=sonido(i, 2); 
+        sonido2(i+nm, 2)=sonido(i, 2);
+       end
+    end
+    if(c==2)
+        sonido=pvoc(sonido2, 2, 2048);
+    end
+    if(c==1)
+        sonido=pvoc(sonido, 2, 2048);
+        fs=fs/2;
+    end
+    handles.newfs=fs;
+    handles.result=sonido;
+    guidata(hObject,handles);
 elseif option == 'radiobutton2'
     %--- Ardilla ---%
+    sonido = handles.sound';
+    fs = handles.fs;
+    [nm, c]=size(sonido);
+    sonido2=zeros(nm*2, c);
+    for i=1:nm
+       sonido2(i, 1)=sonido(i, 1);
+       sonido2(i+nm, 1)=sonido(i, 1);  
+       if(c==2)
+        sonido2(i, 2)=sonido(i, 2); 
+        sonido2(i+nm, 2)=sonido(i, 2);
+       end
+    end
+    if(c==2)
+        sonido=pvoc(sonido2, 0.5, 2048);
+        fs=fs*4;
+    end
+    if(c==1)
+        sonido=pvoc(sonido, 0.5, 2048);
+        fs=fs*2;
+    end
+    handles.newfs=fs;
+    handles.result=sonido;
+    guidata(hObject,handles);
 elseif option == 'radiobutton3'    
     %--- Eco ---%
     sound = handles.sound;
@@ -57,6 +103,7 @@ elseif option == 'radiobutton3'
     k(end) = 1-decay;
     result = conv(sound,k);
     handles.result = result;
+    handles.newfs=fs;
     guidata(hObject,handles)
 elseif option == 'radiobutton4'
     %--- Reverberación ---%
@@ -70,6 +117,7 @@ elseif option == 'radiobutton4'
     k(0.1*fs+1) = 0.03;
     result = conv(sound,k);
     handles.result = result;
+    handles.newfs=fs;
     guidata(hObject,handles);
 elseif option == 'radiobutton5'
     %--- Vibrato---%
@@ -107,9 +155,11 @@ elseif option == 'radiobutton6'
     maxyb = max(abs(yb));
     yb = yb/maxyb;
     handles.result = yb;
+    handles.newfs=Fs;
     guidata(hObject,handles);
 elseif option == 'radiobutton7'
     handles.result = handles.sound;
+    handles.newfs = handles.fs;
     guidata(hObject,handles);
 end
 
@@ -121,7 +171,7 @@ isPushed = ~isPushed;
 if isPushed
     set(hObject,'String','Detener','ForegroundColor','red');
     result = handles.result;
-    fs = handles.fs;
+    fs = handles.newfs;
     sound(result,fs);
 else
     clear playsnd
