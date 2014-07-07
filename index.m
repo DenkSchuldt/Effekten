@@ -52,7 +52,7 @@ else
     %gui
 end
 handles.recording = recording;
-guidata(hObject,handles);
+guidata(hObjet,handles);
 
 
 % --- Executes on button press in pushbutton2.
@@ -60,4 +60,5 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 [filename pathname] = uigetfile({'*.wav'},'File Selector');
 fullpath = strcat(pathname,filename);
 setappdata(0,'fullpath',fullpath);
+delete(handles.output);
 gui

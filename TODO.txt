@@ -1,8 +1,0 @@
-
-  * Grabar audio durante N segundos
-  * Implementar los efectos de:
-    - Zeus
-    - Squirrel
-    - Vibrato
-  * Habilitar la funcionalidad de subir y bajar volumen
-  * Detectar cuando un archivo de audio ha terminado de reproducirse

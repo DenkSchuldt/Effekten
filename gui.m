@@ -187,6 +187,7 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 clear playsnd;
 rmappdata(0,'fullpath');
 delete(handles.output);
+index
 
 
 % --- Executes on button press in pushbutton3.
