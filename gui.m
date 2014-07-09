@@ -111,27 +111,29 @@ elseif option == 'radiobutton4'
     fs = handles.fs;
     k = zeros(1,fs*0.5);
     k(1) = 0.5;
-    k(0.1*fs+1) = 0.3;
-    k(0.1*fs+1) = 0.1;
-    k(0.1*fs+1) = 0.05;
-    k(0.1*fs+1) = 0.03;
+    k(0.01*fs) = 0.3;
+    k(0.1*fs) = 0.1;
+    k(0.2*fs) = 0.05;
+    k(0.3*fs) = 0.03;
+    k(0.4*fs) = 0.01;
+    k(0.5*fs) = 0.01;
     result = conv(sound,k);
     handles.result = result;
     handles.newfs=fs;
     guidata(hObject,handles);
 elseif option == 'radiobutton5'
     %--- Vibrato---%
-    sonido = handles.sound';
+    sonido = handles.sound;
+    sonido = sonido';
     fs = handles.fs;
     [nm, c]=size(sonido);
-    new=zeros(nm, c);
     f=8000;
     for i=1:c
         for j=1:nm
-            new(j, i)=sonido(j, i)*(3*cos(j*pi/f));
+            sonido(j, i)=sonido(j, i)*(3*cos(j*pi/f));
         end  
     end
-    handles.result = new';
+    handles.result = sonido;
     handles.newfs=fs;
 elseif option == 'radiobutton6'
     %--- Wah Wah ---%
