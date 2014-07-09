@@ -35,10 +35,11 @@ handles.ispushed = 0;
 handles.sound = sound;
 handles.fs = fs;
 handles.newfs = fs;
-handles.k = 1;
+handles.k = 0.5;
 handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
+set(handles.slider3,'Value',0.5);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -157,8 +158,8 @@ elseif option == 'radiobutton6'
     sound = handles.sound;
     Fs = handles.fs;
     damp = 0.05; % factor
-    minf=500;
-    maxf=3000;
+    minf=500; % Frecuencia mínima
+    maxf=3000; % Frecuencia máxima
     Fw = 2000; % frecuencia del wah 
     delta = Fw/Fs;
     Fc = minf:delta:maxf; % Onda triangular con valores centrales de frecuencia
@@ -168,13 +169,14 @@ elseif option == 'radiobutton6'
     end
     Fc = Fc(1:length(sound));
     F1 = 2*sin((pi*Fc(1))/Fs);
-    Q1 = 2*damp;                % Tamaño del pasabanda
+    Q1 = 2*damp; % Tamaño del pasabanda
     yh=zeros(size(sound));
     yb=zeros(size(sound));
     yl=zeros(size(sound));
     yh(1) = sound(1);
     yb(1) = F1*yh(1);
     yl(1) = F1*yb(1);
+    % Se genera el efecto
     for n=2:length(sound),
         yh(n) = sound(n) - yl(n-1) - Q1*yb(n-1);
         yb(n) = F1*yh(n) + yb(n-1);
@@ -184,6 +186,7 @@ elseif option == 'radiobutton6'
     %normaliso
     maxyb = max(abs(yb));
     yb = yb/maxyb;
+    %Se guarda el resultado
     handles.result = yb;
     handles.newfs=Fs;
     guidata(hObject,handles);
@@ -202,6 +205,8 @@ if isPushed
     set(hObject,'String','Detener','ForegroundColor','red');
     result = handles.result; %obtengo el resultado con su respectiva frecuencia
     fs = handles.newfs;
+    k = handles.k;
+    result = result * k;
     sound(result,fs);%Reprodusco el audio
 else
     clear playsnd
@@ -220,37 +225,25 @@ delete(handles.output);
 index
 
 
-% --- Executes on button press in pushbutton3.
-function pushbutton3_Callback(hObject, eventdata, handles)
-%less
-k = handles.k; %factor k de volumen
-disp(k);
+% --- Executes on slider movement.
+function slider3_Callback(hObject, eventdata, handles)
+k = get(hObject,'Value');
 sound = handles.sound;
-if k >= 0.2
-    k = k - 0.1; %manipulo el factor de volumen k descendiente
-    output = sound*k;
-    sound = output;
-end
-handles.sound = sound;
+sound = sound*k;
 handles.k = k;
+handles.result = sound;
 guidata(hObject,handles);
 
+% --- Executes during object creation, after setting all properties.
+function slider3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
 
-% --- Executes on button press in pushbutton4.
-function pushbutton4_Callback(hObject, eventdata, handles)
-%more
-k = handles.k; %factor k de volumen
-disp(k);
-sound = handles.sound;
-if k <= 1.9
-    k = k + 0.1; %manipulo el factor de volumen k ascendiente
-    output = sound*k;
-    sound = output;
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-handles.sound = sound;
-handles.k = k;
-guidata(hObject,handles);
-
 
 function uipanel1_CreateFcn(hObject, eventdata, handles)
 function pushbutton1_CreateFcn(hObject, eventdata, handles)

@@ -53,13 +53,11 @@ else
     stop(handles.rec);
     data = getaudiodata(handles.rec); 
     setappdata(0,'fullpath',data);
-    %sound(data,fs);
     handles.recording = recording;
     guidata(hObject,handles);
     delete(handles.output);
     gui
 end
-
 
 
 % --- Executes on button press in pushbutton2.
