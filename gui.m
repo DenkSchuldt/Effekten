@@ -121,6 +121,18 @@ elseif option == 'radiobutton4'
     guidata(hObject,handles);
 elseif option == 'radiobutton5'
     %--- Vibrato---%
+    sonido = handles.sound';
+    fs = handles.fs;
+    [nm, c]=size(sonido);
+    new=zeros(nm, c);
+    f=8000;
+    for i=1:c
+        for j=1:nm
+            new(j, i)=sonido(j, i)*(3*cos(j*pi/f));
+        end  
+    end
+    handles.result = new';
+    handles.newfs=fs;
 elseif option == 'radiobutton6'
     %--- Wah Wah ---%
     % src: http://www.cs.cf.ac.uk/Dave/CM0268/PDF/10_CM0268_Audio_FX.pdf
