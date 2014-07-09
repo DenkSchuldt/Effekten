@@ -219,7 +219,7 @@ disp(k);
 sound = handles.sound;
 if k >= 0.2
     k = k - 0.1;
-    output = conv(sound,k);
+    output = sound*k;
     sound = output;
 end
 handles.sound = sound;
@@ -235,7 +235,7 @@ disp(k);
 sound = handles.sound;
 if k <= 1.9
     k = k + 0.1;
-    output = conv(sound,k);
+    output = sound*k;
     sound = output;
 end
 handles.sound = sound;

@@ -46,16 +46,20 @@ if recording
     rec = audiorecorder(fs, n, 1, id);
     record(rec);
     handles.rec = rec;
+    handles.recording = recording;
+    guidata(hObject,handles);
 else
     set(hObject,'String','Grabar audio','ForegroundColor','green');
     stop(handles.rec);
     data = getaudiodata(handles.rec); 
     setappdata(0,'fullpath',data);
     %sound(data,fs);
+    handles.recording = recording;
+    guidata(hObject,handles);
+    delete(handles.output);
     gui
 end
-handles.recording = recording;
-guidata(hObject,handles);
+
 
 
 % --- Executes on button press in pushbutton2.
