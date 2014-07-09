@@ -51,95 +51,104 @@ function uipanel1_SelectionChangeFcn(hObject, eventdata, handles)
 option = get(hObject,'Tag');
 if option == 'radiobutton1'
     %--- Zeus ---%
-    sonido = handles.sound';
+    %http://www.ee.columbia.edu/~dpwe/resources/matlab/pvoc/
+    %http://www.mathworks.com/matlabcentral/fileexchange/45441-phase-vocoder/content/phase_vocoder/pvoc.m
+    sonido = handles.sound'; %transpongo los datos del audio para trabajarlos normal
     fs = handles.fs;
-    [nm, c]=size(sonido);
-    sonido2=zeros(nm*2, c);
+    [nm, c]=size(sonido); %obtengo el numero de muestras y el numero de canal
+    sonido2=zeros(nm*2, c); %creo un sonido 2 que tendra el doble de tamaño que el audio original
     for i=1:nm
-       sonido2(i, 1)=sonido(i, 1); 
-       sonido2(i+nm, 1)=sonido(i, 1);
+       sonido2(i, 1)=sonido(i, 1); %copio los datos del audio original
+       sonido2(i+nm, 1)=sonido(i, 1); %repito los datos del audio desde la mitad del nuevo audio
        if(c==2)
-        sonido2(i, 2)=sonido(i, 2); 
+        sonido2(i, 2)=sonido(i, 2); %lo mismo si el archivo tiene 2 canales de audio
         sonido2(i+nm, 2)=sonido(i, 2);
        end
     end
+    %la funcion pvoc me escala la informacion en el tiempo del audio sin cambiarme el pitch
+    %sin embargo, tiene diferentes efectos para 1 canal y 2 canales
+    %ademas, me retorna solo la mitad del audio, por eso duplicamos el
+    %audio principal en un mismo archivo
     if(c==2)
-        sonido=pvoc(sonido2, 2, 2048);
+        sonido=pvoc(sonido2, 2, 2048);% 2-->1/2 del tiempo original
     end
     if(c==1)
         sonido=pvoc(sonido, 2, 2048);
         fs=fs/2;
     end
     handles.newfs=fs;
-    handles.result=sonido;
+    handles.result=sonido;%guardo el resultado y la frecuencia a la que lo rerpoducire
     guidata(hObject,handles);
 elseif option == 'radiobutton2'
     %--- Ardilla ---%
+    %realizo los mismos pasos que en Zeus
     sonido = handles.sound';
     fs = handles.fs;
     [nm, c]=size(sonido);
     sonido2=zeros(nm*2, c);
     for i=1:nm
-       sonido2(i, 1)=sonido(i, 1);
+       %duplico la duración del audio en un nuevo archivo
+       sonido2(i, 1)=sonido(i, 1); 
        sonido2(i+nm, 1)=sonido(i, 1);  
        if(c==2)
         sonido2(i, 2)=sonido(i, 2); 
         sonido2(i+nm, 2)=sonido(i, 2);
        end
     end
+    %de igual manera diferentes resultados para 1 y 2 canales
     if(c==2)
-        sonido=pvoc(sonido2, 0.5, 2048);
+        sonido=pvoc(sonido2, 0.5, 2048); %0.5-->2 veces la duracion del audio
         fs=fs*4;
     end
     if(c==1)
         sonido=pvoc(sonido, 0.5, 2048);
         fs=fs*2;
     end
-    handles.newfs=fs;
+    handles.newfs=fs;%guardo los resultados para posterior uso
     handles.result=sonido;
     guidata(hObject,handles);
 elseif option == 'radiobutton3'    
     %--- Eco ---%
     sound = handles.sound;
     fs = handles.fs;
-    delay = 0.15;
-    decay = 0.6;
-    k = zeros(1,delay*fs+2);
+    delay = 0.15; %retardo del eco
+    decay = 0.6; %potencia del audio original
+    k = zeros(1,delay*fs+2); %creo un kernel con eco luego de 0.15 segundos del audio 
     k(1) = decay;
-    k(end) = 1-decay;
-    result = conv(sound,k);
-    handles.result = result;
+    k(end) = 1-decay; %potencia del audio eco
+    result = conv(sound,k); %uso convolución para aplicar el kernel
+    handles.result = result; %guardo los resultados en las variables globales
     handles.newfs=fs;
     guidata(hObject,handles)
 elseif option == 'radiobutton4'
     %--- Reverberación ---%
     sound = handles.sound;
     fs = handles.fs;
-    k = zeros(1,fs*0.5);
-    k(1) = 0.5;
-    k(0.01*fs) = 0.3;
-    k(0.1*fs) = 0.1;
+    k = zeros(1,fs*0.5); %creo un kernel de duracion 0.5 segundos.
+    k(1) = 0.5; %potencia del audio original
+    k(0.01*fs) = 0.3; %Ajusto una cola que comience desde el 0.1 segundo del audio original
+    k(0.1*fs) = 0.1; %potencias para cada pulso de la cola
     k(0.2*fs) = 0.05;
     k(0.3*fs) = 0.03;
     k(0.4*fs) = 0.01;
     k(0.5*fs) = 0.01;
-    result = conv(sound,k);
-    handles.result = result;
+    result = conv(sound,k); %aplico convolucion para obtener mi audio con reverberación
+    handles.result = result; %guardo los resultados.
     handles.newfs=fs;
     guidata(hObject,handles);
 elseif option == 'radiobutton5'
     %--- Vibrato---%
     sonido = handles.sound;
-    sonido = sonido';
+    sonido = sonido'; %transpongo los datos del audio para trabajarlo
     fs = handles.fs;
-    [nm, c]=size(sonido);
-    f=8000;
+    [nm, c]=size(sonido); %obtengo numero de muestras y numero de canales
+    f=8000; %frecuencia con la que construire mi función coseno
     for i=1:c
         for j=1:nm
-            sonido(j, i)=sonido(j, i)*(3*cos(j*pi/f));
+            sonido(j, i)=sonido(j, i)*(3*cos(j*pi/f)); %sumo cada punto de la función coseno con la señal original para tener altos y bajos -vibrato-
         end  
     end
-    handles.result = sonido;
+    handles.result = sonido;%guardo los resultados
     handles.newfs=fs;
     guidata(hObject,handles);
 elseif option == 'radiobutton6'
@@ -147,19 +156,19 @@ elseif option == 'radiobutton6'
     % src: http://www.cs.cf.ac.uk/Dave/CM0268/PDF/10_CM0268_Audio_FX.pdf
     sound = handles.sound;
     Fs = handles.fs;
-    damp = 0.05; % damping factor
+    damp = 0.05; % factor
     minf=500;
     maxf=3000;
-    Fw = 2000; % wah frequency 
+    Fw = 2000; % frecuencia del wah 
     delta = Fw/Fs;
-    Fc = minf:delta:maxf; % triangle wave of centre frequency values
+    Fc = minf:delta:maxf; % Onda triangular con valores centrales de frecuencia
     while(length(Fc) < length(sound) )
         Fc= [ Fc (maxf:-delta:minf) ];
         Fc= [ Fc (minf:delta:maxf) ];
     end
     Fc = Fc(1:length(sound));
     F1 = 2*sin((pi*Fc(1))/Fs);
-    Q1 = 2*damp;                % Size of the pass bands
+    Q1 = 2*damp;                % Tamaño del pasabanda
     yh=zeros(size(sound));
     yb=zeros(size(sound));
     yl=zeros(size(sound));
@@ -172,7 +181,7 @@ elseif option == 'radiobutton6'
         yl(n) = F1*yb(n) + yl(n-1);
         F1 = 2*sin((pi*Fc(n))/Fs);
     end
-    %normalise
+    %normaliso
     maxyb = max(abs(yb));
     yb = yb/maxyb;
     handles.result = yb;
@@ -191,9 +200,9 @@ isPushed = handles.ispushed;
 isPushed = ~isPushed;
 if isPushed
     set(hObject,'String','Detener','ForegroundColor','red');
-    result = handles.result;
+    result = handles.result; %obtengo el resultado con su respectiva frecuencia
     fs = handles.newfs;
-    sound(result,fs);
+    sound(result,fs);%Reprodusco el audio
 else
     clear playsnd
     set(hObject,'String','Reproducir','ForegroundColor','green');
@@ -214,11 +223,11 @@ index
 % --- Executes on button press in pushbutton3.
 function pushbutton3_Callback(hObject, eventdata, handles)
 %less
-k = handles.k;
+k = handles.k; %factor k de volumen
 disp(k);
 sound = handles.sound;
 if k >= 0.2
-    k = k - 0.1;
+    k = k - 0.1; %manipulo el factor de volumen k descendiente
     output = sound*k;
     sound = output;
 end
@@ -230,11 +239,11 @@ guidata(hObject,handles);
 % --- Executes on button press in pushbutton4.
 function pushbutton4_Callback(hObject, eventdata, handles)
 %more
-k = handles.k;
+k = handles.k; %factor k de volumen
 disp(k);
 sound = handles.sound;
 if k <= 1.9
-    k = k + 0.1;
+    k = k + 0.1; %manipulo el factor de volumen k ascendiente
     output = sound*k;
     sound = output;
 end
