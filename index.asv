@@ -45,14 +45,13 @@ if recording
     set(hObject,'String','Grabando','ForegroundColor','red');
     rec = audiorecorder(fs, n, 1, id);
     record(rec);
-    handles.rec = rec;
 else
     set(hObject,'String','Grabar audio','ForegroundColor','green');
-    stop(handles.rec);
-    data = getaudiodata(handles.rec); 
-    setappdata(0,'fullpath',data);
-    %sound(data,fs);
-    gui
+    stop(rec);
+    data = getaudiodata(rec); 
+    %setappdata(0,'fullpath',getaudiodata(arec));
+    sound(data,fs);
+    %gui
 end
 handles.recording = recording;
 guidata(hObject,handles);
